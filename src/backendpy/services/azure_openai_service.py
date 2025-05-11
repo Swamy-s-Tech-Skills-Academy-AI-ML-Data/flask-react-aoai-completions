@@ -3,7 +3,7 @@ from openai import AzureOpenAI
 from utils.env_config import get_config_value
 
 # Load environment variables
-api_key = os.getenv("AZURE_OPENAI_API_KEY")
+api_key = os.getenv("AZURE_OPENAI_API_KEY_V1")
 endpoint = get_config_value("AZURE_OPENAI_ENDPOINT")
 deployment_name = get_config_value("AZURE_OPENAI_DEPLOYMENT_NAME")
 api_version = get_config_value(
