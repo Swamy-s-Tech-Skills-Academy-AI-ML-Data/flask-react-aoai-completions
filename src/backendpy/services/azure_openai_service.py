@@ -8,9 +8,9 @@ from functools import lru_cache
 def _get_client():
     """Build and cache Azure OpenAI client on first use."""
     # Support both key names; prefer explicit env config
-    api_key = (get_config_value("AZURE_OPENAI_API_KEY") or
-               os.getenv("AZURE_OPENAI_API_KEY") or
-               os.getenv("AZURE_OPENAI_API_KEY_V1"))
+    api_key = (os.getenv("AZURE_OPENAI_API_KEY_V1"))
+    # print(f"Using Azure OpenAI API Key: {api_key}")
+
     endpoint = get_config_value(
         "AZURE_OPENAI_ENDPOINT") or os.getenv("AZURE_OPENAI_ENDPOINT")
     deployment_name = get_config_value(
