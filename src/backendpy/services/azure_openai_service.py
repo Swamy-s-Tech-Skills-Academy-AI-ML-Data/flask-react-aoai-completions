@@ -11,12 +11,16 @@ def _get_client():
     api_key = (get_config_value("AZURE_OPENAI_API_KEY") or
                os.getenv("AZURE_OPENAI_API_KEY") or
                os.getenv("AZURE_OPENAI_API_KEY_V1"))
-    endpoint = get_config_value("AZURE_OPENAI_ENDPOINT") or os.getenv("AZURE_OPENAI_ENDPOINT")
-    deployment_name = get_config_value("AZURE_OPENAI_DEPLOYMENT_NAME") or os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
-    api_version = get_config_value("AZURE_OPENAI_API_VERSION") or os.getenv("AZURE_OPENAI_API_VERSION")
+    endpoint = get_config_value(
+        "AZURE_OPENAI_ENDPOINT") or os.getenv("AZURE_OPENAI_ENDPOINT")
+    deployment_name = get_config_value(
+        "AZURE_OPENAI_DEPLOYMENT_NAME") or os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+    api_version = get_config_value(
+        "AZURE_OPENAI_API_VERSION") or os.getenv("AZURE_OPENAI_API_VERSION")
 
     if not all([api_key, endpoint, deployment_name, api_version]):
-        raise RuntimeError("Azure OpenAI configuration incomplete. Check environment variables.")
+        raise RuntimeError(
+            "Azure OpenAI configuration incomplete. Check environment variables.")
 
     client = AzureOpenAI(
         api_key=api_key,

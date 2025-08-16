@@ -60,12 +60,14 @@ class DummyClient:
 
 @pytest.fixture(autouse=True)
 def patch_azure_openai(monkeypatch):
-    # Patch class before (re)import
-    monkeypatch.setattr(
-        'services.azure_openai_service.AzureOpenAI', DummyClient, raising=False)
     import services.azure_openai_service as svc
-    importlib.reload(svc)
-    monkeypatch.setattr(svc, 'client', DummyClient())
+    # Replace _get_client to return a dummy that mimics interface
+
+    def _fake_get_client():
+        dummy = DummyClient()
+        dummy._deployment_name = 'fake-deployment'
+        return dummy
+    monkeypatch.setattr(svc, '_get_client', _fake_get_client, raising=False)
     yield
 
 
