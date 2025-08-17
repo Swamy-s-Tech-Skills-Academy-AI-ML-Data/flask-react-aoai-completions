@@ -20,7 +20,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "types": ["vitest"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/__tests__", "**/*.test.ts", "**/*.test.tsx"]
 }
