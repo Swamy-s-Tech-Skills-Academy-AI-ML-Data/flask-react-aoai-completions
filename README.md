@@ -6,9 +6,14 @@ ChatGPT Clone – Python Flask + React (Vite + TypeScript) using Azure OpenAI Ch
 
 This project provides:
 
-- A Flask backend exposing `/api/` and `/api/completions` (single‑turn chat) calling Azure OpenAI.
+- A Flask backend exposing:
+  - `GET /` and `GET /api/` (welcome JSON)
+  - `POST /api/completions` (single‑turn chat completion)
+  - `GET /api/health/config` (non‑secret config + source: env / file)
 - A React + TypeScript frontend with a simple multi‑message chat UI.
-- Basic logging (text or JSON) and unit tests (pytest & Vitest + Testing Library).
+- Structured logging (plain text or JSON) with request correlation IDs & latency.
+- Unified JSON error handling (404 / HTTPException / generic 500) + masked internal errors.
+- Fast isolated tests (pytest) without `pytest-flask`; Azure calls fully mocked.
 
 ## 🗂 Project Structure
 
@@ -48,6 +53,16 @@ pip freeze > requirements.txt
 ```
 
 Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
+
+## ⚙️ Environment Loading Precedence
+
+Each configuration key resolves in this order:
+
+1. Exported OS / process environment variable
+2. First `.env` discovered walking upward from `src/backend/utils/env_config.py` to repo root
+3. Absent (null)
+
+Inspect non‑secret effective values & their source at `GET /api/health/config`. Secrets are never returned.
 
 ## 🔹 To install dependencies later
 
@@ -125,7 +140,7 @@ flask run --port=5009
 
 ## 🐍 Running Backend Tests (pytest)
 
-Tests live in `tests/` and mock Azure OpenAI (no real API calls).
+Tests live in `tests/` and mock Azure OpenAI (no real API calls). We **do not** use `pytest-flask` (avoids dependency on deprecated Flask 2.x internals). Fixtures explicitly build the app + test client.
 
 ```powershell
 cd <repo-root>
@@ -133,14 +148,21 @@ cd <repo-root>
 pytest -q
 ```
 
-Sample output:
+Sample (current) output:
 
 ```text
-....  [100%]
-4 passed in 0.30s
+......  [100%]
+6 passed in 0.xx s
 ```
 
-During demo: point out tests are fast, isolated (no network), giving rapid feedback for refactors.
+Covered:
+
+1. Root & `/api/` welcome routes
+2. Completions validation (missing prompt)
+3. Completions success (mocked Azure)
+4. 404 JSON handler
+5. Generic exception path returns masked message
+6. Usage object structure
 
 ## ⚛️ Frontend Setup & Run
 
@@ -177,22 +199,31 @@ Tests       2 passed (2)
 
 Demo tip: Open `Chat.test.tsx` to show `vi.mock` usage isolating UI from network.
 
-## 🗒 API Endpoint
+## 🗒 Key API Endpoints
 
-`POST /api/completions`
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | / | Root welcome JSON |
+| GET | /api/ | API namespace welcome |
+| GET | /api/health/config | Non‑secret config values + source |
+| POST | /api/completions | Single‑turn chat completion |
 
-```jsonc
-Request: { "prompt": "Explain Azure OpenAI" }
-Response: {
- "response": "Azure OpenAI provides...",
- "usage": { "prompt_chars": 23, "response_chars": 42 }
-}
-```
-
-Errors return:
+Example request:
 
 ```json
-{ "error": "Prompt too long. Max 4000 characters." }
+{ "prompt": "Explain Azure OpenAI" }
+```
+
+Example success response:
+
+```json
+{ "response": "...", "usage": { "prompt_chars": 23, "response_chars": 42 } }
+```
+
+Example validation error:
+
+```json
+{ "error": "'prompt' is required" }
 ```
 
 ### Future Endpoint Targets (Roadmap Talking Points)
@@ -203,7 +234,7 @@ Errors return:
 
 ## 🧪 Test Philosophy
 
-Backend: minimal fast tests (route availability, validation, success) with a dummy client to avoid network calls.
+Backend: minimal fast tests (routes, validation, success, error handlers) with a dummy Azure client (no network).
 Frontend: UI rendering & interaction for Chat component; mock API layer.
 
 ## 🪵 Logging
@@ -212,6 +243,7 @@ Configure via `LOG_LEVEL` & `LOG_FORMAT`.
 
 - Text example: `2025-08-16 18:20:11 | INFO | Starting Chat Completions API`
 - JSON example: `{ "ts": "2025-08-16T18:20:11Z", "level": "INFO", "msg": "Starting Chat Completions API" }`
+  - Request logs also include: `correlation_id`, `path`, `method`, `latency_ms`.
 
 Demo tips:
 
@@ -314,11 +346,11 @@ What is Pythagoras' theorem?
 | 1 | Show architecture diagram | Separation of concerns; stateless backend |
 | 2 | Open `app.py` | Factory pattern, blueprint registration |
 | 3 | Open `azure_openai_service.py` | Lazy client + env vars + testability |
-| 4 | Run `pytest -q` | Fast isolated tests (mocked Azure) |
+| 4 | Run `pytest -q` | Fast isolated tests (mocked Azure, 6 passing) |
 | 5 | Open `Chat.tsx` | Local message state; simple UX flow |
 | 6 | Run `npm run test` | UI tests with Testing Library |
 | 7 | Execute prompts 1–5 | Different capability categories |
-| 8 | Toggle LOG_FORMAT | Plain vs JSON logs; observability angle |
+| 8 | Toggle LOG_FORMAT | Plain vs JSON logs; correlation & latency |
 | 9 | Discuss roadmap | Streaming, multi‑turn, moderation, security |
 
 ## 🔐 Security Talking Points (Brief)
