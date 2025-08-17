@@ -83,18 +83,18 @@ const Chat: React.FC = () => {
             </div>
             <div className="mt-4 flex flex-col">
                 {error && <div className="text-red-600 mb-2 text-sm">{error}</div>}
-                <textarea
-                    className="border w-full p-3 rounded-lg shadow-sm resize-none focus:outline-none focus:ring focus:ring-blue-300 transition text-gray-800 text-sm font-normal leading-relaxed min-h-[10vh] max-h-[20vh] bg-white"
-                    placeholder="Type your question..."
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendRequest(); } }}
-                />
-                <div className="flex justify-end mt-3">
+                <div className="flex gap-3 items-stretch">
+                    <textarea
+                        className="border flex-1 p-3 rounded-lg shadow-sm resize-none focus:outline-none focus:ring focus:ring-blue-300 transition text-gray-800 text-sm font-normal leading-relaxed min-h-[3rem] max-h-[8rem] bg-white"
+                        placeholder="Type your question..."
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendRequest(); } }}
+                    />
                     <button
                         onClick={sendRequest}
                         disabled={loading}
-                        className="bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-5 py-2.5 rounded-md shadow hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center gap-2"
+                        className="bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-5 rounded-md shadow hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center gap-2 shrink-0 min-h-[3rem]"
                     >
                         {loading ? 'Sending…' : 'Send'}
                     </button>
