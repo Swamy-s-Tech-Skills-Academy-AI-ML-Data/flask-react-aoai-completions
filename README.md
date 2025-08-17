@@ -14,7 +14,7 @@ This project provides:
 
 ```text
 src/
- backendpy/
+ backend/
   app.py
   api/
   services/
@@ -83,7 +83,7 @@ LOG_FORMAT=json          # or 'text'
 ## 🐍 Backend Setup & Run
 
 ```powershell
-cd src/backendpy
+cd src/backend
 python -m venv .venv
 . .venv/Scripts/Activate.ps1
 pip install -r requirements.txt
@@ -103,7 +103,7 @@ Tests live in `tests/` and mock Azure OpenAI (no real API calls).
 
 ```powershell
 cd <repo-root>
-. .\src\backendpy\.venv\Scripts\Activate.ps1
+. .\src\backend\.venv\Scripts\Activate.ps1
 pytest -q
 ```
 
@@ -278,7 +278,7 @@ What is Pythagoras' theorem?
 
 ## 📄 Consolidated Documentation
 
-- Backend deep dive: `docs/backendpy.md`
+- Backend deep dive: `docs/backend.md`
 - Frontend walkthrough: `docs/frontend.md`
 
 ## 🧭 Demo Script Cheat Sheet
@@ -305,10 +305,10 @@ What is Pythagoras' theorem?
 
 ```powershell
 # Backend
-cd src/backendpy; if (!(Test-Path .venv)) { python -m venv .venv }; . .venv/Scripts/Activate.ps1; pip install -r requirements.txt; python app.py
+cd src/backend; if (!(Test-Path .venv)) { python -m venv .venv }; . .venv/Scripts/Activate.ps1; pip install -r requirements.txt; python app.py
 
 # Backend tests
-cd (Resolve-Path ../..); . .\src\backendpy\.venv\Scripts\Activate.ps1; pytest -q
+cd (Resolve-Path ../..); . .\src\backend\.venv\Scripts\Activate.ps1; pytest -q
 
 # Frontend
 cd src/frontend; npm install; npm run dev

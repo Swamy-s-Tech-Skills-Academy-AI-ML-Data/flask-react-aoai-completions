@@ -4,7 +4,7 @@ A Simple Python Flask API to interact with Azure OpenAI.
 
 ## 🔹 Installation & Setup
 
-> 1. Changed Directory to `D:\STSA\flask-react-aoai-completions\src\backendpy`
+> 1. Changed Directory to `D:\STSA\flask-react-aoai-completions\src\backend`
 
 ```bash
 python --version
