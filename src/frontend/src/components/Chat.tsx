@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { fetchAIResponse } from "../services/api";
 
 interface Message { role: 'user' | 'assistant'; content: string; timestamp: number }
@@ -64,13 +66,14 @@ const Chat: React.FC = () => {
                         >
                             <div
                                 className={`max-w-[85%] md:max-w-[70%] px-4 py-2 rounded-2xl shadow-sm whitespace-pre-wrap break-words leading-relaxed text-sm border transition-colors ${isUser
-                                    ? 'bg-blue-600 text-white border-blue-500 rounded-br-sm'
-                                    : 'bg-white text-gray-800 border-gray-200 rounded-bl-sm'}
+                                    ? 'bg-blue-100 text-blue-900 border-blue-300 rounded-br-sm hover:bg-blue-50'
+                                    : 'bg-white text-gray-800 border-gray-200 rounded-bl-sm hover:bg-gray-50'}
                             hover:shadow`}
                                 title={`Sent at ${formatTimestamp(m.timestamp)}`}
                             >
-                                <div className="font-semibold mb-0.5 text-xs opacity-80 tracking-wide">
-                                    {isUser ? 'You' : 'AI'}
+                                <div className="font-semibold mb-0.5 text-xs opacity-80 tracking-wide flex items-center gap-1">
+                                    <FontAwesomeIcon icon={isUser ? faUser : faRobot} className="h-3.5 w-3.5" aria-hidden="true" />
+                                    <span>{isUser ? 'You' : 'AI'}</span>
                                 </div>
                                 <div>{m.content}</div>
                             </div>
