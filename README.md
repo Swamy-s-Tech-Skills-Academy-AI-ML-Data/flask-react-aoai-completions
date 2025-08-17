@@ -1,4 +1,4 @@
-# flask-react-aoai-completions
+# Azure OpenAI Text Generation Starter (Flask API + Vite React)
 
 ChatGPT Clone – Python Flask + React (Vite + TypeScript) using Azure OpenAI Chat Completions.
 
@@ -29,6 +29,42 @@ src/
 tests/            (Python pytest tests)
 ```
 
+## 🎯 45‑Minute Demo Agenda (Suggested Flow)
+
+| Time (min) | Segment | Focus |
+|-----------:|---------|-------|
+| 0 – 5 | Introduction | What & why, quick architecture preview |
+| 5 – 15 | Backend Tour | Flask factory, route, Azure service wrapper, logging |
+| 15 – 25 | Frontend Tour | Components, state (messages), API abstraction, tests |
+| 25 – 35 | Live Prompt Use Cases | Run 5 scenarios below; observe responses & logs |
+| 35 – 42 | Quality & Testing | Pytest + Vitest runs, validation, mocking strategy |
+| 42 – 45 | Wrap Up | Roadmap, security, Q&A |
+
+> Tip: Keep an eye on time; if running long, compress the Frontend Tour to 5 mins and move straight to prompts.
+
+## 🧠 Architecture (High-Level)
+
+```text
+          +------------------+             +----------------------------+
+          |   React (Vite)   |  fetch JSON |   Flask API (/api/*)       |
+          |  Chat Component  +-----------> | completions_routes.py      |
+          |  Local Messages  |             |  Validation / Logging      |
+          +---------+--------+             +--------------+-------------+
+                    |                                     |
+                    |                                     v
+                    |                           azure_openai_service.py
+                    |                            (_get_client -> Azure)
+                    |                                     |
+          User <----+                           Azure OpenAI Deployment
+```
+
+Highlights:
+
+- Stateless backend (single‑turn) + frontend-held conversation history.
+- Lazy Azure client creation; easy to mock in tests.
+- Validation (prompt length) + consistent JSON error shape.
+- Configurable logging: plain text or structured JSON.
+
 ## ⚙️ Environment Variables (Backend `.env`)
 
 ```env
@@ -54,6 +90,13 @@ pip install -r requirements.txt
 python app.py   # starts on http://127.0.0.1:5009
 ```
 
+Alternate (Flask CLI) if preferred:
+
+```powershell
+$env:FLASK_APP="app"
+flask run --port=5009
+```
+
 ## 🐍 Running Backend Tests (pytest)
 
 Tests live in `tests/` and mock Azure OpenAI (no real API calls).
@@ -70,6 +113,8 @@ Sample output:
 ....  [100%]
 4 passed in 0.30s
 ```
+
+During demo: point out tests are fast, isolated (no network), giving rapid feedback for refactors.
 
 ## ⚛️ Frontend Setup & Run
 
@@ -104,6 +149,8 @@ Test Files  1 passed (1)
 Tests       2 passed (2)
 ```
 
+Demo tip: Open `Chat.test.tsx` to show `vi.mock` usage isolating UI from network.
+
 ## 🗒 API Endpoint
 
 `POST /api/completions`
@@ -122,6 +169,12 @@ Errors return:
 { "error": "Prompt too long. Max 4000 characters." }
 ```
 
+### Future Endpoint Targets (Roadmap Talking Points)
+
+- Streaming tokens (SSE) endpoint.
+- Multi‑turn conversation with server-side context trimming.
+- Moderation / safety pre-check endpoint.
+
 ## 🧪 Test Philosophy
 
 Backend: minimal fast tests (route availability, validation, success) with a dummy client to avoid network calls.
@@ -134,6 +187,11 @@ Configure via `LOG_LEVEL` & `LOG_FORMAT`.
 - Text example: `2025-08-16 18:20:11 | INFO | Starting Chat Completions API`
 - JSON example: `{ "ts": "2025-08-16T18:20:11Z", "level": "INFO", "msg": "Starting Chat Completions API" }`
 
+Demo tips:
+
+1. Tail the log file, send a valid prompt, then an empty one to show INFO vs ERROR lines.
+2. Toggle `LOG_FORMAT=json` live (restart) to compare formats.
+
 ## 🛠 Troubleshooting 401 Errors (Azure OpenAI)
 
 1. Endpoint form: `https://<resource>.openai.azure.com` (no extra path).
@@ -142,12 +200,28 @@ Configure via `LOG_LEVEL` & `LOG_FORMAT`.
 4. API version supported by your model.
 5. Remove stray quotes or spaces around keys.
 
+If still failing: regenerate key, verify deployment *name* (not model), ensure region matches endpoint, and confirm API version supported.
+
 ## 🚀 Next Ideas
 
 - SSE streaming
 - Multi‑turn with conversation trimming
 - Rate limiting & auth
 - Docker / CI pipeline
+
+## 💬 Five Prompt Use Cases (with Intent)
+
+| # | Intent | What To Highlight |
+|---|--------|-------------------|
+| 1 | Summarization | Model condenses dense technical text (One-Hot Encoding) |
+| 2 | Sentiment Classification | Consistency across positive / negative / neutral samples |
+| 3 | Multilingual + Translation | Story generation + Telugu → Hindi → English chain |
+| 4 | Semantic Interpretation | Short phrase meaning / context inference |
+| 5 | Factual Recall | Educational math concept clarity |
+
+Use these in order (roughly 2 minutes / prompt). Keep logs visible.
+
+### Use case 1 – Summarization
 
 ## UI First Look
 
@@ -201,3 +275,51 @@ What is the meaning of the above?
 ```text  
 What is Pythagoras' theorem?
 ```
+
+## 📄 Consolidated Documentation
+
+- Backend deep dive: `docs/backendpy.md`
+- Frontend walkthrough: `docs/frontend.md`
+
+## 🧭 Demo Script Cheat Sheet
+
+| Step | Action | Callout |
+|------|--------|---------|
+| 1 | Show architecture diagram | Separation of concerns; stateless backend |
+| 2 | Open `app.py` | Factory pattern, blueprint registration |
+| 3 | Open `azure_openai_service.py` | Lazy client + env vars + testability |
+| 4 | Run `pytest -q` | Fast isolated tests (mocked Azure) |
+| 5 | Open `Chat.tsx` | Local message state; simple UX flow |
+| 6 | Run `npm run test` | UI tests with Testing Library |
+| 7 | Execute prompts 1–5 | Different capability categories |
+| 8 | Toggle LOG_FORMAT | Plain vs JSON logs; observability angle |
+| 9 | Discuss roadmap | Streaming, multi‑turn, moderation, security |
+
+## 🔐 Security Talking Points (Brief)
+
+- Keys never sent to frontend; server mediates Azure access.
+- Future: rate limiting (Flask-Limiter), JWT / session auth, Azure Key Vault + Managed Identity.
+- Add content moderation before calling completions for production safety.
+
+## 📦 Quick Commands (Copy/Paste Convenience)
+
+```powershell
+# Backend
+cd src/backendpy; if (!(Test-Path .venv)) { python -m venv .venv }; . .venv/Scripts/Activate.ps1; pip install -r requirements.txt; python app.py
+
+# Backend tests
+cd (Resolve-Path ../..); . .\src\backendpy\.venv\Scripts\Activate.ps1; pytest -q
+
+# Frontend
+cd src/frontend; npm install; npm run dev
+
+# Frontend tests
+cd src/frontend; npm run test
+```
+
+## 📜 License
+
+See `LICENSE`.
+
+---
+*Optimized for a 45‑minute, demo-heavy session. Trim sections to reclaim time if live questions expand.*
