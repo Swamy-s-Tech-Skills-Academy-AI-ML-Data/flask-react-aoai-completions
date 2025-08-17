@@ -398,6 +398,24 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+\n# --- Added for Python/Node project ---
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+logs/
+dist/
+build/
+coverage/
+.pytest_cache/
+node_modules/
+*.log
+*.sqlite3
+*.db
+/.DS_Store
+/.idea/
+/.vscode/
 
 .env
 .venv
