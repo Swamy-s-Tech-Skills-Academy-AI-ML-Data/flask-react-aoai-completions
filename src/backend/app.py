@@ -22,7 +22,11 @@ def create_app():
     def handle_generic_exception(e):
         app.logger.exception("Unhandled exception: %s", e)
         cid = getattr(g, 'correlation_id', None)
-        body = {'error': 'Internal server error'}
+        # Allow explicit runtime misconfiguration messages to surface; mask others
+        message = 'Internal server error'
+        if isinstance(e, RuntimeError) and 'configuration incomplete' in str(e):
+            message = str(e)
+        body = {'error': message}
         if cid:
             body['correlation_id'] = cid
         return jsonify(body), 500
