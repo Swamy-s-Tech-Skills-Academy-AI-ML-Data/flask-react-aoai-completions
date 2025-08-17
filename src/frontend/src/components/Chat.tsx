@@ -39,7 +39,7 @@ const Chat: React.FC = () => {
     };
 
     return (
-        <div className="font-inter w-full max-w-4xl mx-auto flex flex-col rounded-xl border border-gray-200 shadow-sm bg-white/80 backdrop-blur p-5">
+        <div className="font-inter w-full max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col rounded-xl border border-gray-200 shadow-sm bg-white/80 backdrop-blur p-5">
             <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2"><span role="img" aria-label="robot">🤖</span> Chat with Azure OpenAI</h2>
             <div className="bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner text-left border border-gray-200 overflow-y-auto flex-grow min-h-[50vh] max-h-[60vh] space-y-4">
                 {messages.map((m, i) => (
