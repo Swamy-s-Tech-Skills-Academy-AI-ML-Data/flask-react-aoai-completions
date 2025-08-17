@@ -47,6 +47,8 @@ pip install flask-cors
 pip freeze > requirements.txt
 ```
 
+Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
+
 ## 🔹 To install dependencies later
 
 ```bash
