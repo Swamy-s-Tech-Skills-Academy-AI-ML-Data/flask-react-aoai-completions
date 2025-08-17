@@ -8,6 +8,7 @@ from flask_cors import CORS
 from api.home_routes import home_api_bp
 from utils.logging_config import configure_logging
 from api.completions_routes import completions_api_bp
+from utils.env_config import list_effective_config
 
 
 def create_app():
@@ -59,7 +60,14 @@ def create_app():
     app.register_blueprint(home_api_bp, url_prefix='/api')
     app.register_blueprint(completions_api_bp, url_prefix='/api')
 
-    app.logger.info("Starting Chat Completions API")
+    # Log summarized non-secret config once
+    cfg = list_effective_config()
+    redacted_cfg = {k: {**v, 'value': (v['value'] if k not in ('AZURE_OPENAI_ENDPOINT',) else v['value'])} for k, v in cfg.items()}
+    app.logger.info("Starting Chat Completions API | config=%s", redacted_cfg)
+
+    @app.route('/api/health/config', methods=['GET'])
+    def health_config():  # pragma: no cover simple utility
+        return jsonify(list_effective_config()), 200
     return app
 
 
