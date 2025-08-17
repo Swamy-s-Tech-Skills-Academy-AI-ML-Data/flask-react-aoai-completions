@@ -1,7 +1,7 @@
 const Footer: React.FC = () => {
     const year = new Date().getFullYear();
     return (
-        <footer className="mt-auto bg-white/90 backdrop-blur border-t border-gray-200 text-gray-600 text-xs md:text-sm py-3 px-4 flex flex-col md:flex-row items-center justify-between gap-2">
+        <footer className="mt-auto bg-gradient-to-r from-slate-50 via-blue-50/60 to-slate-50 backdrop-blur border-t border-gray-200 text-gray-600 text-xs md:text-sm py-3 px-4 flex flex-col md:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-2">
                 <span className="font-medium">Azure OpenAI Text Generation</span>
                 <span className="hidden md:inline text-gray-400">•</span>
