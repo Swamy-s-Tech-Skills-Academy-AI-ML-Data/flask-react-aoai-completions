@@ -152,3 +152,52 @@ Configure via `LOG_LEVEL` & `LOG_FORMAT`.
 ## UI First Look
 
 ![UI First Looks](./docs/images/Session2_FirstLook.PNG)
+
+## Prompts to text in the live session
+
+### Use case 1
+
+```text
+One-Hot Encoding is a technique used in machine learning and data preprocessing to convert categorical variables into a numerical format that algorithms can understand. Since many models cannot directly process text or categorical labels, one-hot encoding represents each category as a binary vector. For example, if you have three categories—Red, Green, and Blue—they would be represented as [1,0,0], [0,1,0], and [0,0,1] respectively. This ensures that no ordinal relationship is implied between categories, which is important because Red is not inherently greater or smaller than Blue or Green.
+
+However, while One-Hot Encoding is simple and effective, it can lead to what is known as the “curse of dimensionality” when dealing with features that have a large number of categories. Each unique category requires its own column in the encoded dataset, which significantly increases memory usage and computational cost. For this reason, alternatives like label encoding, frequency encoding, or embedding techniques are sometimes preferred for high-cardinality features. Still, one-hot encoding remains one of the most widely used and reliable methods for handling categorical variables, especially when the number of categories is manageable.
+
+Please summarize
+```
+
+### Use case 2
+
+```text
+This book on AI was absolutely fantastic! The explanations were clear, the examples were practical, and I walked away with a strong understanding of both the fundamentals and real-world applications. A must-read for anyone serious about AI.
+
+Sentiment?
+
+
+I was very disappointed with this AI book. The writing was confusing, the code samples didn’t work, and the content felt outdated. Honestly, it was a waste of money and time.
+
+Sentiment?
+
+The book provided a decent overview of AI concepts. It wasn’t too detailed, but it gave a general sense of the subject. If you’re looking for depth, you may need to consult other resources, but as an introduction, it’s okay.
+
+Sentiment?
+```
+
+### Use case 3
+
+```text
+Tell me a story about the Sun, the Moon, the Stars, and other planets in Telugu. Translate that into Hindi and English
+```
+
+### Use case 4
+
+```text
+Way to go
+
+What is the meaning of the above?
+```
+
+### Use case 5
+
+```text  
+What is Pythagoras' theorem?
+```
