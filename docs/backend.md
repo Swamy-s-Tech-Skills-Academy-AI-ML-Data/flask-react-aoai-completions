@@ -20,6 +20,61 @@ pip install flask-cors
 pip freeze > requirements.txt
 ```
 
+## 🔹 Testing (Pytest) – No need for `pytest-flask`
+
+We intentionally do **not** install the `pytest-flask` plugin. It tries to import deprecated internal Flask symbols (e.g. `_request_ctx_stack`) that were removed in Flask 3.x, causing an `ImportError`. Our tests stay lightweight by defining only the fixtures we actually need.
+
+### How it works
+
+`tests/conftest.py` provides:
+
+1. A dummy Azure OpenAI client via an `autouse` fixture (`patch_azure_openai`) so no real network call occurs.
+2. An `app` fixture that imports and calls `create_app()` from `app.py`.
+3. A `client` fixture that simply returns `app.test_client()` (the standard Flask test client—no plugin wrapper needed).
+
+Minimal snippet (simplified):
+
+```python
+@pytest.fixture
+def app():
+  from app import create_app
+  return create_app()
+
+@pytest.fixture
+def client(app):
+  return app.test_client()
+```
+
+### Why this is enough
+
+- Flask already ships a `test_client()` method.
+- We don’t rely on any extra helpers that `pytest-flask` would add.
+- Fewer dependencies → faster, more stable test runs.
+
+### Running the tests
+
+From repo root (ensures `pyproject.toml` pytest config is picked up):
+
+```powershell
+cd <repo-root>
+. .\src\backend\.venv\Scripts\Activate.ps1
+pytest -q
+```
+
+### Configuration
+
+`pyproject.toml` includes:
+
+```toml
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = [".", "src/backend"]
+```
+
+That `pythonpath` entry lets tests import backend modules without adjusting `PYTHONPATH` manually.
+
+Result: fast, isolated tests (mocked Azure) with **zero** need for `pytest-flask`.
+
 ## 🔹 To install dependencies later
 
 ```bash
@@ -103,150 +158,20 @@ Press **CTRL + C** in the PowerShell terminal to stop the server.
 
 ---
 
----
-
-# Flask Azure Open AI api
-
-A Simple Python Flask API to Interact with Azure Open AI
-
-## Executing the API
-
-```bash
-python app.py           # On Windows
-```
-
-```Powershell
-$env:FLASK_APP = "app"
-$env:FLASK_ENV = "development"
-flask run
-```
-
-## Few Commands to get started
-
-```bash
-pip install virtualenv
-python.exe -m pip install --upgrade pip
-python -m venv .venv
-.venv/Scripts/activate
-pip freeze
-deactivate
-
-pip install Flask python-dotenv openai
-pip freeze > ./requirements.txt
-
-pip install -r ./requirements.txt
-```
-
-## Steps to create the API
-
-> 1. Create a new folder
-> 1. Create an .env file and Environment Variables
-> 1. Create a virtual environment
-> 1. Install `pip install Flask python-dotenv openai` and other dependencies
-> 1. pip freeze > requirements.txt
-> 1. Create a `app.py` file
-
-Your **README.md** is clear and provides a good starting point! ✅
-
-### 🔹 **Suggestions for Improvement:**
-
-1. **Expand API Usage Section** – Add a sample API request & response.
-2. **Environment Variables Section** – Mention required `.env` variables for Azure OpenAI.
-3. **Project Structure Section** – Briefly describe your folders.
-4. **Streaming Support (if included)** – Note how responses will be streamed.
-
----
-
-### 📌 **Updated `README.md` with More Details**
-
-````markdown
-# Flask Azure OpenAI API
-
-A Simple Python Flask API to interact with Azure OpenAI.
-
-## 🔹 Executing the API
-
-```bash
-python app.py           # On Windows
-```
-````
-
-```powershell
-$env:FLASK_APP = "app"
-$env:FLASK_ENV = "development"
-flask run
-```
-
-## 🔹 Environment Variables
-
-Create a `.env` file in the root folder with:
-
-```ini
-AZURE_OPENAI_API_KEY="your-api-key"
-AZURE_OPENAI_ENDPOINT="https://your-resource-name.openai.azure.com/"
-AZURE_OPENAI_DEPLOYMENT_NAME="gpt-4"
-```
-
-## 🔹 Installation & Setup
-
-```bash
-pip install virtualenv
-python.exe -m pip install --upgrade pip
-python -m venv .venv
-.venv/Scripts/activate
-pip install Flask python-dotenv openai
-pip freeze > requirements.txt
-```
-
-To install dependencies later:
-
-```bash
-pip install -r requirements.txt
-```
-
-## 🔹 Project Structure
-
-```
-flask-react-aoai-completions/
-│── docs/
-│── src/
-│   ├── backend/
-│   │   ├── api/ (Routes)
-│   │   ├── services/ (Azure OpenAI Integration)
-│   │   ├── utils/ (Configs & Logging)
-│   │   ├── app.py
-│── .gitignore
-│── README.md
-```
-
-## 🔹 API Usage
-
-### **1️⃣ Get Completion Response**
-
-#### **Request**
+## 🔹 API Usage (Example)
 
 ```http
 POST /api/completions
 Content-Type: application/json
 
-{
-    "prompt": "Write a short story about AI."
-}
+{"prompt": "Explain Azure OpenAI"}
 ```
 
-#### **Response**
+Example response:
 
 ```json
 {
-  "response": "Once upon a time, an AI named Nova..."
+  "response": "Azure OpenAI provides...",
+  "usage": { "prompt_chars": 21, "response_chars": 42 }
 }
 ```
-
-### **2️⃣ Streamed Response (Optional)**
-
-If streaming is enabled, responses will be sent **chunk by chunk**.
-
----
-
-🚀 **Ready to implement the API? Let me know!** 🚀  
-I can generate `app.py` + `completions_routes.py` + `azure_openai_service.py` to kickstart the API. ✅
