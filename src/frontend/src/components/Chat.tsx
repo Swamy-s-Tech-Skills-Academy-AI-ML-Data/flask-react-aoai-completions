@@ -54,9 +54,9 @@ const Chat: React.FC = () => {
     const formatTimestamp = (ts: number) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     return (
-        <div className="font-inter w-full max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-grow min-h-0 rounded-xl border border-gray-200 shadow-sm bg-white/80 backdrop-blur p-5">
+        <div className="font-inter w-full max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col h-full min-h-0 rounded-xl border border-gray-200 shadow-sm bg-white/80 backdrop-blur p-5 overflow-hidden">
             <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2"><span role="img" aria-label="robot">🤖</span> Chat with Azure OpenAI</h2>
-            <div ref={scrollRef} className="bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner border border-gray-200 overflow-y-auto flex-grow min-h-[40vh] max-h-[60vh] space-y-4">
+            <div ref={scrollRef} className="bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner border border-gray-200 flex-1 min-h-0 overflow-y-auto space-y-4">
                 {messages.map((m, i) => {
                     const isUser = m.role === 'user';
                     return (
