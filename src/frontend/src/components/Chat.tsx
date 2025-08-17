@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchAIResponse } from "../services/api";
 
-interface Message { role: 'user' | 'assistant'; content: string }
+interface Message { role: 'user' | 'assistant'; content: string; timestamp: number }
 
 const Chat: React.FC = () => {
     const [prompt, setPrompt] = useState<string>("");
     const [messages, setMessages] = useState<Message[]>([
-        { role: 'assistant', content: 'Ask me something about Azure OpenAI.' }
+        { role: 'assistant', content: 'Ask me something about Azure OpenAI.', timestamp: Date.now() }
     ]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -14,8 +14,8 @@ const Chat: React.FC = () => {
     const sendRequest = async () => {
         if (!prompt.trim() || loading) return;
         setError(null);
-        const userMsg: Message = { role: 'user', content: prompt };
-        setMessages(prev => [...prev, userMsg, { role: 'assistant', content: 'Thinking... 🤔' }]);
+        const userMsg: Message = { role: 'user', content: prompt, timestamp: Date.now() };
+        setMessages(prev => [...prev, userMsg, { role: 'assistant', content: 'Thinking... 🤔', timestamp: Date.now() }]);
         setLoading(true);
 
         const result = await fetchAIResponse(prompt);
@@ -27,21 +27,34 @@ const Chat: React.FC = () => {
             const updated = [...prev];
             const idx = updated.findIndex((m, i) => i === updated.length - 1 && m.role === 'assistant' && m.content.startsWith('Thinking'));
             if ('error' in result) {
-                if (idx >= 0) updated[idx] = { role: 'assistant', content: `Error: ${result.error}` };
-                else updated.push({ role: 'assistant', content: `Error: ${result.error}` });
+                if (idx >= 0) updated[idx] = { ...updated[idx], content: `Error: ${result.error}` };
+                else updated.push({ role: 'assistant', content: `Error: ${result.error}`, timestamp: Date.now() });
             } else {
-                if (idx >= 0) updated[idx] = { role: 'assistant', content: result.response };
-                else updated.push({ role: 'assistant', content: result.response });
+                if (idx >= 0) updated[idx] = { ...updated[idx], content: result.response };
+                else updated.push({ role: 'assistant', content: result.response, timestamp: Date.now() });
             }
             return updated;
         });
         if ('error' in result) setError(result.error);
     };
 
+    // Auto-scroll to the newest message when messages update
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    useEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        // Use rAF to ensure layout is settled
+        requestAnimationFrame(() => {
+            el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+        });
+    }, [messages]);
+
+    const formatTimestamp = (ts: number) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     return (
         <div className="font-inter w-full max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col rounded-xl border border-gray-200 shadow-sm bg-white/80 backdrop-blur p-5">
             <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2"><span role="img" aria-label="robot">🤖</span> Chat with Azure OpenAI</h2>
-            <div className="bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner border border-gray-200 overflow-y-auto flex-grow min-h-[50vh] max-h-[60vh] space-y-4">
+            <div ref={scrollRef} className="bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner border border-gray-200 overflow-y-auto flex-grow min-h-[50vh] max-h-[60vh] space-y-4">
                 {messages.map((m, i) => {
                     const isUser = m.role === 'user';
                     return (
@@ -54,6 +67,7 @@ const Chat: React.FC = () => {
                                     ? 'bg-blue-600 text-white border-blue-500 rounded-br-sm'
                                     : 'bg-white text-gray-800 border-gray-200 rounded-bl-sm'}
                             hover:shadow`}
+                                title={`Sent at ${formatTimestamp(m.timestamp)}`}
                             >
                                 <div className="font-semibold mb-0.5 text-xs opacity-80 tracking-wide">
                                     {isUser ? 'You' : 'AI'}
