@@ -62,7 +62,8 @@ def create_app():
 
     # Log summarized non-secret config once
     cfg = list_effective_config()
-    redacted_cfg = {k: {**v, 'value': (v['value'] if k not in ('AZURE_OPENAI_ENDPOINT',) else v['value'])} for k, v in cfg.items()}
+    redacted_cfg = {k: {**v, 'value': (v['value'] if k not in (
+        'AZURE_OPENAI_ENDPOINT',) else v['value'])} for k, v in cfg.items()}
     app.logger.info("Starting Chat Completions API | config=%s", redacted_cfg)
 
     @app.route('/api/health/config', methods=['GET'])
