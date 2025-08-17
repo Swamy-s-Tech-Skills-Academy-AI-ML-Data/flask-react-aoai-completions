@@ -29,6 +29,30 @@ src/
 tests/            (Python pytest tests)
 ```
 
+## 🔹 Installation & Setup
+
+> 1. Changed Directory to `D:\STSA\flask-react-aoai-completions\src\backend`
+
+```bash
+python --version
+pip --version
+
+pip install virtualenv
+python -m venv .venv
+.venv/Scripts/activate
+python -m pip install --upgrade pip
+
+pip install Flask python-dotenv openai
+pip install flask-cors
+pip freeze > requirements.txt
+```
+
+## 🔹 To install dependencies later
+
+```bash
+pip install -r requirements.txt
+```
+
 ## 🎯 45‑Minute Demo Agenda (Suggested Flow)
 
 | Time (min) | Segment | Focus |
