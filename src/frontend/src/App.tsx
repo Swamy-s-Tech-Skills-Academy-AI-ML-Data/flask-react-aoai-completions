@@ -5,9 +5,9 @@ import Footer from "./components/Footer";
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 to-slate-100">
+    <div className="h-screen flex flex-col bg-gradient-to-b from-slate-50 to-slate-100">
       <TopNav />
-      <main className="flex-grow min-h-0 w-full px-3 md:px-6 py-3 flex justify-center items-stretch">
+      <main className="flex-1 min-h-0 w-full px-3 md:px-6 py-3 flex justify-center items-stretch">
         <Chat />
       </main>
       <Footer />

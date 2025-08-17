@@ -54,9 +54,9 @@ const Chat: React.FC = () => {
     const formatTimestamp = (ts: number) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     return (
-        <div className="font-inter w-full max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col rounded-xl border border-gray-200 shadow-sm bg-white/80 backdrop-blur p-5">
+        <div className="font-inter w-full max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col h-full rounded-xl border border-gray-200 shadow-sm bg-white/80 backdrop-blur p-3">
             <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2"><span role="img" aria-label="robot">🤖</span> Chat with Azure OpenAI</h2>
-            <div ref={scrollRef} className="custom-scrollbar bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner border border-gray-200 overflow-y-auto min-h-[50vh] max-h-[60vh] space-y-4">
+            <div ref={scrollRef} className="custom-scrollbar bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner border border-gray-200 overflow-y-auto flex-1 space-y-4">
                 {messages.map((m, i) => {
                     const isUser = m.role === 'user';
                     return (
@@ -83,7 +83,7 @@ const Chat: React.FC = () => {
             </div>
             <div className="mt-4 flex flex-col">
                 {error && <div className="text-red-600 mb-2 text-sm">{error}</div>}
-                <div className="flex gap-3 items-stretch">
+                <div className="flex gap-2 items-stretch">
                     <textarea
                         className="border flex-1 p-3 rounded-lg shadow-sm resize-none focus:outline-none focus:ring focus:ring-blue-300 transition text-gray-800 text-sm font-normal leading-relaxed min-h-[3rem] max-h-[8rem] bg-white"
                         placeholder="Type your question..."
