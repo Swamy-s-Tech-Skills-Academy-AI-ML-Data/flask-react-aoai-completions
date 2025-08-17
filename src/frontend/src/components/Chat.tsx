@@ -41,13 +41,28 @@ const Chat: React.FC = () => {
     return (
         <div className="font-inter w-full max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col rounded-xl border border-gray-200 shadow-sm bg-white/80 backdrop-blur p-5">
             <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2"><span role="img" aria-label="robot">🤖</span> Chat with Azure OpenAI</h2>
-            <div className="bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner text-left border border-gray-200 overflow-y-auto flex-grow min-h-[50vh] max-h-[60vh] space-y-4">
-                {messages.map((m, i) => (
-                    <div key={i} className={m.role === 'user' ? 'text-blue-700' : 'text-gray-800'}>
-                        <strong>{m.role === 'user' ? 'You' : 'AI'}:</strong>{' '}
-                        <span className="whitespace-pre-wrap break-words">{m.content}</span>
-                    </div>
-                ))}
+            <div className="bg-gray-50 text-gray-900 p-4 rounded-lg shadow-inner border border-gray-200 overflow-y-auto flex-grow min-h-[50vh] max-h-[60vh] space-y-4">
+                {messages.map((m, i) => {
+                    const isUser = m.role === 'user';
+                    return (
+                        <div
+                            key={i}
+                            className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'}`}
+                        >
+                            <div
+                                className={`max-w-[85%] md:max-w-[70%] px-4 py-2 rounded-2xl shadow-sm whitespace-pre-wrap break-words leading-relaxed text-sm border transition-colors ${isUser
+                                    ? 'bg-blue-600 text-white border-blue-500 rounded-br-sm'
+                                    : 'bg-white text-gray-800 border-gray-200 rounded-bl-sm'}
+                            hover:shadow`}
+                            >
+                                <div className="font-semibold mb-0.5 text-xs opacity-80 tracking-wide">
+                                    {isUser ? 'You' : 'AI'}
+                                </div>
+                                <div>{m.content}</div>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
             <div className="mt-4 flex flex-col">
                 {error && <div className="text-red-600 mb-2 text-sm">{error}</div>}
