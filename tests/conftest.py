@@ -5,7 +5,7 @@ import importlib
 import pytest
 
 ROOT = pathlib.Path(__file__).parent.parent.resolve()
-BACKEND = ROOT / 'src' / 'backendpy'
+BACKEND = ROOT / 'src' / 'backend'
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
