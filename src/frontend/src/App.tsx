@@ -1,22 +1,16 @@
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
+// Sidebar & old Header removed in redesign
+import TopNav from "./components/TopNav";
 import Chat from "./components/Chat";
 import Footer from "./components/Footer";
 
 const App: React.FC = () => {
   return (
-    <div className="h-screen flex flex-row">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Main content area */}
-      <div className="flex flex-col w-full">
-        <Header />
-        <div className="flex-grow flex justify-center items-center">
-          <Chat />
-        </div>
-        <Footer />
-      </div>
+    <div className="h-screen flex flex-col bg-gradient-to-b from-slate-50 to-slate-100">
+      <TopNav />
+      <main className="flex-1 min-h-0 w-full px-3 md:px-6 py-3 flex justify-center items-stretch">
+        <Chat />
+      </main>
+      <Footer />
     </div>
   );
 };

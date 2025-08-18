@@ -7,16 +7,70 @@ Some Description.
 Run the following `PowerShell` commands:
 
 ```powershell
-# Create a new Vite + React + TypeScript project
-npm create vite@latest cgpt-clone-gaih
+# Create a new Vite + React + TypeScript pr---
+
+## **✅ What's Next?**
+
+- **Enhance the UI** – Improve styling, add animations.
+- **Integrate Auth0** – Implement login/logout properly.
+- **Improve API Calls** – Handle streaming responses from Flask.
+
+---
+
+## **📌 Common Layout Issues & Fixes**
+
+### **Issue: Gap Between Chat Area and Footer**
+
+**Problem:** You may notice a purple/empty gap between the chat container and footer when using flexbox layout. This happens when:
+- Using `min-h-screen` instead of `h-screen`
+- The main content area doesn't properly expand to fill available space
+- Footer has `mt-auto` but the parent container allows extra height
+
+**Symptoms:**
+- Visible gap/space between chat area and footer
+- Chat container not utilizing full viewport height
+- Overall layout shorter than expected
+
+**✅ Solution:**
+
+Update your main layout container (`App.tsx`) to use proper height constraints:
+
+```tsx
+const App: React.FC = () => {
+  return (
+    <div className="h-screen flex flex-col bg-gradient-to-b from-slate-50 to-slate-100">
+      <TopNav />
+      <main className="flex-1 min-h-0 w-full px-3 md:px-6 py-3 flex justify-center items-stretch">
+        <Chat />
+      </main>
+      <Footer />
+    </div>
+  );
+};
+```
+
+**Key Changes:**
+
+- `min-h-screen` → `h-screen`: Forces container to exact viewport height
+- `flex-grow` → `flex-1`: More explicit space distribution
+- `min-h-0`: Prevents flex items from having minimum content size
+
+**Result:** Chat area expands to fill all available space between header and footer with no gaps.
+
+---
+
+This should give you a **React + TypeScript UI** integrated with **Flask & Azure OpenAI**! 🚀 Let me know if you need further refinements. 😃create vite@latest cgpt-clone-gaih
 
 # Move into the project folder
+
 cd cgpt-clone-gaih
 
 # Install Tailwind CSS
+
 npm install -D tailwindcss@3 postcss autoprefixer
 npm install @heroicons/react
 npx tailwindcss init -p
+
 ```
 
 ## 📌 Step 2: Configure Tailwind

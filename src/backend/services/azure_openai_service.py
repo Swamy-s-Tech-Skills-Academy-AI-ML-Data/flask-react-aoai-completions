@@ -33,13 +33,18 @@ def _get_client():
 
 
 def fetch_completion_response(prompt: str) -> str:
-    """Call Azure OpenAI and return the full completion text (single turn)."""
-    client = _get_client()
-    chat_prompt = [
-        {"role": "system", "content": "You are an AI assistant that helps people find information."},
-        {"role": "user", "content": prompt}
-    ]
+    """Call Azure OpenAI and return the full completion text (single turn).
+
+    Any exception (including configuration issues) is converted into a prefixed
+    string so the route layer can produce a JSON error without invoking the
+    global exception handler (preserving informative messages in dev).
+    """
     try:
+        client = _get_client()
+        chat_prompt = [
+            {"role": "system", "content": "You are an AI assistant that helps people find information."},
+            {"role": "user", "content": prompt}
+        ]
         response = client.chat.completions.create(
             model=client._deployment_name,
             messages=chat_prompt,
@@ -53,5 +58,5 @@ def fetch_completion_response(prompt: str) -> str:
         if response.choices:
             return response.choices[0].message.content
         return ""
-    except Exception as e:
-        return f"Error: {str(e)}"
+    except Exception as e:  # Broad catch converts to controlled error string
+        return f"Error: {e}"
