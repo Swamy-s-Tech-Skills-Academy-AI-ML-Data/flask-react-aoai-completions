@@ -62,8 +62,9 @@ def create_app():
     app.register_blueprint(home_api_bp, url_prefix='/api')
 
     # Config routes
+    from api.config_routes import config_api_bp
     app.register_blueprint(
-        health_api_bp, url_prefix='/api')  # /api/config/info
+        config_api_bp, url_prefix='/api')  # /api/config/info
 
     # Completions routes
     app.register_blueprint(completions_api_bp, url_prefix='/api')
