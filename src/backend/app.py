@@ -6,8 +6,10 @@ from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 
 from api.home_routes import home_api_bp
-from utils.logging_config import configure_logging
 from api.completions_routes import completions_api_bp
+from api.health_routes import health_api_bp
+
+from utils.logging_config import configure_logging
 from utils.env_config import list_effective_config
 
 
@@ -55,9 +57,15 @@ def create_app():
     app.register_error_handler(HTTPException, handle_http_exception)
     app.register_error_handler(Exception, handle_generic_exception)
 
-    # Blueprints
+    # Home routes
     app.register_blueprint(home_api_bp, name='home_route_direct')
     app.register_blueprint(home_api_bp, url_prefix='/api')
+
+    # Config routes
+    app.register_blueprint(
+        health_api_bp, url_prefix='/api')  # /api/config/info
+
+    # Completions routes
     app.register_blueprint(completions_api_bp, url_prefix='/api')
 
     # Log summarized non-secret config once
@@ -65,10 +73,6 @@ def create_app():
     redacted_cfg = {k: {**v, 'value': (v['value'] if k not in (
         'AZURE_OPENAI_ENDPOINT',) else v['value'])} for k, v in cfg.items()}
     app.logger.info("Starting Chat Completions API | config=%s", redacted_cfg)
-
-    @app.route('/api/health/config', methods=['GET'])
-    def health_config():  # pragma: no cover simple utility
-        return jsonify(list_effective_config()), 200
     return app
 
 
