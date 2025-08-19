@@ -54,6 +54,27 @@ pip freeze > requirements.txt
 
 Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
 
+```powershell
+python --version
+pip --version
+
+pip install virtualenv
+python -m venv .venv
+. .venv/Scripts/Activate.ps1   # PowerShell activation (Windows)
+python -m pip install --upgrade pip
+
+pip install -r requirements.txt  # Preferred (already committed)
+# OR initial manual install (when bootstrapping):
+# pip install Flask python-dotenv openai flask-cors
+# pip freeze > requirements.txt
+```
+
+Interpreter versioning: For consistent environments, add a `.python-version` file at the repo root (recommended for pyenv/IDE integration). Example content:
+
+```
+3.13.5
+```
+
 ## ⚙️ Environment Loading Precedence
 
 Each configuration key resolves in this order:
@@ -373,6 +394,29 @@ cd src/frontend; npm install; npm run dev
 
 # Frontend tests
 cd src/frontend; npm run test
+```
+
+```powershell
+# Backend
+cd src/backend
+if (!(Test-Path .venv)) { python -m venv .venv }
+. .venv/Scripts/Activate.ps1
+pip install -r requirements.txt
+python app.py
+
+# Backend tests
+cd (Resolve-Path ../..)
+. .\src\backend\.venv\Scripts\Activate.ps1
+pytest -q
+
+# Frontend
+cd src/frontend
+npm install
+npm run dev
+
+# Frontend tests
+cd src/frontend
+npm run test
 ```
 
 ## 📜 License
