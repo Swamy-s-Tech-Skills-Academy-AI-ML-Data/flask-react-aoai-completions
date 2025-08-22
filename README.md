@@ -9,7 +9,7 @@ This project provides:
 - A Flask backend exposing:
   - `GET /` and `GET /api/` (welcome JSON)
   - `POST /api/completions` (single‑turn chat completion)
-  - `GET /api/health/config` (non‑secret config + source: env / file)
+    - `GET /api/config/info` (non‑secret config + source: env / file)
 - A React + TypeScript frontend with a simple multi‑message chat UI.
 - Structured logging (plain text or JSON) with request correlation IDs & latency.
 - Unified JSON error handling (404 / HTTPException / generic 500) + masked internal errors.
@@ -19,31 +19,25 @@ This project provides:
 
 ```text
 src/
- backend/
-  app.py
-  api/
-  services/
-  utils/
-  requirements.txt
- frontend/
-  src/
-   components/
-## 🔹 Installation & Setup
-python --version
-
-pip install virtualenv
-pip install flask-cors
-pip freeze > requirements.txt
+  backend/
+    app.py
+    api/
+    services/
+    utils/
+    requirements.txt
+  frontend/
+    package.json
+    src/
+      components/
+      services/
 ```
 
-Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
+## 🔹 Installation & Setup
 
-```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true } }}%%
-flowchart LR
+```powershell
+python --version
 pip --version
 
-  direction TB
 pip install virtualenv
 python -m venv .venv
 . .venv/Scripts/Activate.ps1   # PowerShell activation (Windows)
@@ -51,10 +45,11 @@ python -m pip install --upgrade pip
 
 pip install -r requirements.txt  # Preferred (already committed)
 # OR initial manual install (when bootstrapping):
-  direction TB
 # pip install Flask python-dotenv openai flask-cors
 # pip freeze > requirements.txt
 ```
+
+Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
 
 Interpreter versioning: For consistent environments, add a `.python-version` file at the repo root (recommended for pyenv/IDE integration). Example content:
 
@@ -67,15 +62,6 @@ Interpreter versioning: For consistent environments, add a `.python-version` fil
 Use the Python launcher to list all installed Python versions it recognizes:
 
 ```powershell
-
-### Architecture (columns)
-
-| Frontend | Backend | Platform |
-|---|---|---|
-| Vite + React (TypeScript) UI<br/>`Chat.tsx`, components | Flask API (`/api/*`)<br/>Blueprints: `home_routes`, `completions_routes` | Azure OpenAI Deployment |
-| API client<br/>`src/frontend/src/services/api.ts` | Service layer<br/>`services/azure_openai_service.py` | — |
-| Local message state | Utilities<br/>`utils/env_config.py`, `utils/logging_config.py` | — |
-| Dev proxy (optional) in `vite.config.ts` | Diagnostics<br/>`GET /api/config/info` | — |
 py -0
 ```
 
@@ -93,7 +79,7 @@ Each configuration key resolves in this order:
 2. First `.env` discovered walking upward from `src/backend/utils/env_config.py` to repo root
 3. Absent (null)
 
-Inspect non‑secret effective values & their source at `GET /api/health/config`. Secrets are never returned.
+Inspect non‑secret effective values & their source at `GET /api/config/info`. Secrets are never returned.
 
 ## 🔹 To install dependencies later
 
@@ -314,7 +300,7 @@ Demo tip: Open `Chat.test.tsx` to show `vi.mock` usage isolating UI from network
 |--------|------|-------------|
 | GET | / | Root welcome JSON |
 | GET | /api/ | API namespace welcome |
-| GET | /api/health/config | Non‑secret config values + source |
+| GET | /api/config/info | Non‑secret config values + source |
 | POST | /api/completions | Single‑turn chat completion |
 
 Example request:
