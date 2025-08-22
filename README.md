@@ -26,28 +26,12 @@ src/
   utils/
   requirements.txt
  frontend/
-  package.json
   src/
    components/
-   services/
-   __tests__/  (Vitest tests)
-tests/            (Python pytest tests)
-```
-
 ## 🔹 Installation & Setup
-
-> 1. Changed Directory to `D:\STSA\flask-react-aoai-completions\src\backend`
-
-```bash
 python --version
-pip --version
 
 pip install virtualenv
-python -m venv .venv
-.venv/Scripts/activate
-python -m pip install --upgrade pip
-
-pip install Flask python-dotenv openai
 pip install flask-cors
 pip freeze > requirements.txt
 ```
@@ -55,7 +39,7 @@ pip freeze > requirements.txt
 Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
 
 ```powershell
-python --version
+  | GET | /api/config/info | Non‑secret config values + source |
 pip --version
 
 pip install virtualenv
@@ -96,11 +80,10 @@ pip install -r requirements.txt
 | Time (min) | Segment | Focus |
 |-----------:|---------|-------|
 | 0 – 5 | Introduction | What & why, quick architecture preview |
-| 5 – 15 | Backend Tour | Flask factory, route, Azure service wrapper, logging |
-| 15 – 25 | Frontend Tour | Components, state (messages), API abstraction, tests |
-| 25 – 35 | Live Prompt Use Cases | Run 5 scenarios below; observe responses & logs |
-| 35 – 42 | Quality & Testing | Pytest + Vitest runs, validation, mocking strategy |
-| 42 – 45 | Wrap Up | Roadmap, security, Q&A |
+| 5 – 20 | Backend Tour | Flask factory, route, Azure service wrapper, logging |
+| 20 – 30 | Frontend Tour | Components, state (messages), API abstraction, tests |
+| 30 – 40 | Live Prompt Use Cases | Run 5 scenarios below; observe responses & logs |
+| 40 – 45 | Wrap Up | Roadmap, security, Q&A |
 
 > Tip: Keep an eye on time; if running long, compress the Frontend Tour to 5 mins and move straight to prompts.
 

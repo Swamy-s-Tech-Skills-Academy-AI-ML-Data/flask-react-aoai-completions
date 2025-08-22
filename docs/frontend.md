@@ -1,9 +1,12 @@
-# React + TypeScript + Vite
+# React + TypeScript + Vite + Tailwind CSS
 
 Some Description.
 
 ## 📌 Step 1: Set Up the React + TypeScript Project
 
+```powershell
+# Create a new Vite + React + TypeScript project
+npm create vite@latest cgpt-clone-gaih -- --template react-ts
 Run the following `PowerShell` commands:
 
 ```powershell
