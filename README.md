@@ -38,10 +38,12 @@ pip freeze > requirements.txt
 
 Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
 
-```powershell
-  | GET | /api/config/info | Non‑secret config values + source |
+```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true } }}%%
+flowchart LR
 pip --version
 
+  direction TB
 pip install virtualenv
 python -m venv .venv
 . .venv/Scripts/Activate.ps1   # PowerShell activation (Windows)
@@ -49,6 +51,7 @@ python -m pip install --upgrade pip
 
 pip install -r requirements.txt  # Preferred (already committed)
 # OR initial manual install (when bootstrapping):
+  direction TB
 # pip install Flask python-dotenv openai flask-cors
 # pip freeze > requirements.txt
 ```
@@ -64,6 +67,15 @@ Interpreter versioning: For consistent environments, add a `.python-version` fil
 Use the Python launcher to list all installed Python versions it recognizes:
 
 ```powershell
+
+### Architecture (columns)
+
+| Frontend | Backend | Platform |
+|---|---|---|
+| Vite + React (TypeScript) UI<br/>`Chat.tsx`, components | Flask API (`/api/*`)<br/>Blueprints: `home_routes`, `completions_routes` | Azure OpenAI Deployment |
+| API client<br/>`src/frontend/src/services/api.ts` | Service layer<br/>`services/azure_openai_service.py` | — |
+| Local message state | Utilities<br/>`utils/env_config.py`, `utils/logging_config.py` | — |
+| Dev proxy (optional) in `vite.config.ts` | Diagnostics<br/>`GET /api/config/info` | — |
 py -0
 ```
 
