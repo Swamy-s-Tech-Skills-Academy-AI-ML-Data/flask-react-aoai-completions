@@ -55,7 +55,7 @@ pip install -r requirements.txt  # Preferred (already committed)
 
 Interpreter versioning: For consistent environments, add a `.python-version` file at the repo root (recommended for pyenv/IDE integration). Example content:
 
-```
+```text
 3.13.5
 ```
 
@@ -181,6 +181,71 @@ Configure a proxy or set `VITE_API_BASE_URL` (create `src/frontend/.env`):
 ```env
 VITE_API_BASE_URL=http://127.0.0.1:5009/api
 ```
+
+## 🌐 CORS: Connecting Frontend and Backend
+
+The backend enables CORS via Flask-CORS so the Vite dev server (<http://localhost:5173>) can call the API (<http://127.0.0.1:5009>).
+
+### Option A — Keep CORS open for local dev (already enabled)
+
+`src/backend/app.py` calls `CORS(app)` which allows requests from any origin in development. To restrict to your dev UI origin, tighten it like this:
+
+```python
+# src/backend/app.py
+from flask_cors import CORS
+
+CORS(app,
+     resources={r"/api/*": {"origins": [
+         "http://localhost:5173",
+         "http://127.0.0.1:5173"
+     ]}},
+     supports_credentials=True)
+```
+
+If you enable `supports_credentials=True`, include credentials on the client when needed:
+
+```ts
+// src/frontend/src/services/api.ts (example)
+fetch(`${baseUrl}/completions`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ prompt }),
+  credentials: 'include', // only if you rely on cookies/auth
+})
+```
+
+### Option B — Use the Vite dev proxy (avoids CORS during dev)
+
+Proxy all `/api` calls from the Vite server to the Flask backend to keep everything same-origin in dev:
+
+```ts
+// src/frontend/vite.config.ts
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:5009',
+        changeOrigin: true,
+      },
+    },
+  },
+})
+```
+
+Then call relative paths from the frontend (no base URL needed):
+
+```ts
+await fetch('/api/completions', { /* ... */ })
+```
+
+### Common CORS errors and fixes
+
+- “CORS Missing Allow Origin”: Ensure the backend sets `Access-Control-Allow-Origin` to your UI origin (or `*` for dev).
+- Preflight (OPTIONS) blocked: Make sure Flask-CORS is installed and applied to your routes; avoid custom blocks on `OPTIONS`.
+- Credentials rejected: Use `supports_credentials=True` and `credentials: 'include'` in fetch. Avoid wildcard `*` with credentials.
+
+See MDN’s CORS error guide for detailed cases and fixes:
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS/Errors>
 
 ## ⚛️ Running Frontend Tests (Vitest + Testing Library)
 
