@@ -99,3 +99,41 @@ If you see a gap between chat area and footer, ensure your top-level container u
 - CORS errors in the browser? Either enable Flask-CORS on the backend or use the Vite proxy (recommended in dev).
 - 404 for `/api/config/info`? Make sure the Flask server is running and the endpoint is registered as `/api/config/info`.
 - Mixed content or wrong port? Verify `VITE_API_BASE_URL` or dev proxy targets the backend `http://127.0.0.1:5009`.
+
+## 8) Dependency updates (Aug 2025)
+
+Summary of safe updates applied to the frontend toolchain:
+
+- Node engines: added `"engines": { "node": ">=18.0.0" }` in `package.json`.
+- Removed stray local dependency entry (cleanup): `"cgpt-clone-gaih": "file:"`.
+- Core runtime: `react@^19`, `react-dom@^19`.
+- Build tooling: `vite@^6.2`, `@vitejs/plugin-react@^4.3`.
+- Styling: `tailwindcss@^3.4`, `postcss@^8.5`, `autoprefixer@^10.4`.
+- Types & lint: `typescript@~5.7`, `eslint@^9.21`, `@eslint/js@^9.21`, `typescript-eslint@^8.24`.
+- Test stack: `vitest@^2.1.9`, `jsdom@^26`, `@testing-library/*` latest within current majors.
+
+How to validate locally (PowerShell):
+
+```powershell
+cd src/frontend
+npm install             # refresh lockfile and install
+npm run build           # ensure production build succeeds
+npm run test -s         # ensure tests pass
+```
+
+Quick version and update commands (PowerShell):
+
+```powershell
+cd D:\STSAAIMLDT\flask-react-aoai-completions\src\frontend
+node -v
+npm -v
+npm update              # update within current major ranges
+npm run build
+npm test
+```
+
+If you hit oddities after upgrading:
+
+- Clear modules and reinstall: `rimraf node_modules package-lock.json; npm install` (or delete manually on Windows).
+- Ensure Node 18+ is in use: `node -v`.
+- Re-run `npm run build` and `npm test` to confirm.
