@@ -26,28 +26,12 @@ src/
   utils/
   requirements.txt
  frontend/
-  package.json
   src/
    components/
-   services/
-   __tests__/  (Vitest tests)
-tests/            (Python pytest tests)
-```
-
 ## 🔹 Installation & Setup
-
-> 1. Changed Directory to `D:\STSA\flask-react-aoai-completions\src\backend`
-
-```bash
 python --version
-pip --version
 
 pip install virtualenv
-python -m venv .venv
-.venv/Scripts/activate
-python -m pip install --upgrade pip
-
-pip install Flask python-dotenv openai
 pip install flask-cors
 pip freeze > requirements.txt
 ```
@@ -55,7 +39,7 @@ pip freeze > requirements.txt
 Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
 
 ```powershell
-python --version
+  | GET | /api/config/info | Non‑secret config values + source |
 pip --version
 
 pip install virtualenv
@@ -71,8 +55,22 @@ pip install -r requirements.txt  # Preferred (already committed)
 
 Interpreter versioning: For consistent environments, add a `.python-version` file at the repo root (recommended for pyenv/IDE integration). Example content:
 
-```
+```text
 3.13.5
+```
+
+### Check installed Python versions (Windows)
+
+Use the Python launcher to list all installed Python versions it recognizes:
+
+```powershell
+py -0
+```
+
+To include install paths as well:
+
+```powershell
+py -0p
 ```
 
 ## ⚙️ Environment Loading Precedence
@@ -96,11 +94,10 @@ pip install -r requirements.txt
 | Time (min) | Segment | Focus |
 |-----------:|---------|-------|
 | 0 – 5 | Introduction | What & why, quick architecture preview |
-| 5 – 15 | Backend Tour | Flask factory, route, Azure service wrapper, logging |
-| 15 – 25 | Frontend Tour | Components, state (messages), API abstraction, tests |
-| 25 – 35 | Live Prompt Use Cases | Run 5 scenarios below; observe responses & logs |
-| 35 – 42 | Quality & Testing | Pytest + Vitest runs, validation, mocking strategy |
-| 42 – 45 | Wrap Up | Roadmap, security, Q&A |
+| 5 – 20 | Backend Tour | Flask factory, route, Azure service wrapper, logging |
+| 20 – 30 | Frontend Tour | Components, state (messages), API abstraction, tests |
+| 30 – 40 | Live Prompt Use Cases | Run 5 scenarios below; observe responses & logs |
+| 40 – 45 | Wrap Up | Roadmap, security, Q&A |
 
 > Tip: Keep an eye on time; if running long, compress the Frontend Tour to 5 mins and move straight to prompts.
 
@@ -198,6 +195,71 @@ Configure a proxy or set `VITE_API_BASE_URL` (create `src/frontend/.env`):
 ```env
 VITE_API_BASE_URL=http://127.0.0.1:5009/api
 ```
+
+## 🌐 CORS: Connecting Frontend and Backend
+
+The backend enables CORS via Flask-CORS so the Vite dev server (<http://localhost:5173>) can call the API (<http://127.0.0.1:5009>).
+
+### Option A — Keep CORS open for local dev (already enabled)
+
+`src/backend/app.py` calls `CORS(app)` which allows requests from any origin in development. To restrict to your dev UI origin, tighten it like this:
+
+```python
+# src/backend/app.py
+from flask_cors import CORS
+
+CORS(app,
+     resources={r"/api/*": {"origins": [
+         "http://localhost:5173",
+         "http://127.0.0.1:5173"
+     ]}},
+     supports_credentials=True)
+```
+
+If you enable `supports_credentials=True`, include credentials on the client when needed:
+
+```ts
+// src/frontend/src/services/api.ts (example)
+fetch(`${baseUrl}/completions`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ prompt }),
+  credentials: 'include', // only if you rely on cookies/auth
+})
+```
+
+### Option B — Use the Vite dev proxy (avoids CORS during dev)
+
+Proxy all `/api` calls from the Vite server to the Flask backend to keep everything same-origin in dev:
+
+```ts
+// src/frontend/vite.config.ts
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:5009',
+        changeOrigin: true,
+      },
+    },
+  },
+})
+```
+
+Then call relative paths from the frontend (no base URL needed):
+
+```ts
+await fetch('/api/completions', { /* ... */ })
+```
+
+### Common CORS errors and fixes
+
+- “CORS Missing Allow Origin”: Ensure the backend sets `Access-Control-Allow-Origin` to your UI origin (or `*` for dev).
+- Preflight (OPTIONS) blocked: Make sure Flask-CORS is installed and applied to your routes; avoid custom blocks on `OPTIONS`.
+- Credentials rejected: Use `supports_credentials=True` and `credentials: 'include'` in fetch. Avoid wildcard `*` with credentials.
+
+See MDN’s CORS error guide for detailed cases and fixes:
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS/Errors>
 
 ## ⚛️ Running Frontend Tests (Vitest + Testing Library)
 

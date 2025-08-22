@@ -9,7 +9,7 @@ Python Flask backend powering Azure OpenAI Chat Completions for the demo React U
 - Robust error handling: unified JSON responses for 4xx/5xx + correlation IDs.
 - Structured logging (text or JSON) with latency & request correlation.
 - Environment loading with upward `.env` discovery + OS env precedence.
-- Health & diagnostics endpoint: `GET /api/health/config` (non‑secret config & source visibility).
+- Config diagnostics endpoint: `GET /api/config/info` (non‑secret config & source visibility).
 - Azure OpenAI service wrapper with cached client + safe exception wrapping.
 - Prompt validation (required + max 4000 chars).
 - Fully isolated tests (no `pytest-flask`, Azure mocked) – 6 tests covering success, validation & error handlers.
@@ -48,7 +48,7 @@ Configuration values are resolved with the following precedence per key:
 2. Value from the first `.env` file found while walking upward from `utils/env_config.py` to the repository root
 3. Absent (reported as `null` in health output)
 
-Visible (non secret) keys surfaced via `/api/health/config`:
+Visible (non secret) keys surfaced via `/api/config/info`:
 
 - `AZURE_OPENAI_ENDPOINT`
 - `AZURE_OPENAI_DEPLOYMENT_NAME`
@@ -108,7 +108,7 @@ The correlation ID (if present) is echoed in the response header `X-Request-ID` 
 
 ## 🔹 Health & Diagnostics Endpoint
 
-`GET /api/health/config` returns a JSON document listing each visible config key with:
+`GET /api/config/info` returns a JSON document listing each visible config key with:
 
 ```json
 {
@@ -291,7 +291,7 @@ Visit:
 
 - Base: <http://127.0.0.1:5009/>
 - API root: <http://127.0.0.1:5009/api/>
-- Health config: <http://127.0.0.1:5009/api/health/config>
+- Config info: <http://127.0.0.1:5009/api/config/info>
 
 Test a completion (PowerShell):
 
@@ -335,4 +335,4 @@ Press **CTRL + C** in the PowerShell terminal to stop the server.
 
 ## 🔹 Quick API Usage Recap
 
-See Completions Contract above. For dynamic config inspection use `GET /api/health/config`.
+See Completions Contract above. For dynamic config inspection use `GET /api/config/info`.
