@@ -483,6 +483,23 @@ What is Pythagoras' theorem?
 | 8 | Toggle LOG_FORMAT | Plain vs JSON logs; correlation & latency |
 | 9 | Discuss roadmap | Streaming, multi‑turn, moderation, security |
 
+## ✅ Pre‑demo checklist (2–3 minutes)
+
+- Open two PowerShell terminals and set titles for clarity:
+  - `$host.UI.RawUI.WindowTitle = 'Backend API'`
+  - `$host.UI.RawUI.WindowTitle = 'Vite Dev Server'`
+- Backend
+  - In `src/backend`, activate venv and run: `python app.py`
+  - Visit `http://127.0.0.1:5009/api/` → shows welcome JSON
+  - Visit `http://127.0.0.1:5009/api/config/info` → shows non‑secret config with sources
+- Frontend
+  - In `src/frontend`, run: `npm run dev` → `http://localhost:5173`
+  - Ensure either `VITE_API_BASE_URL` points to `http://127.0.0.1:5009/api` or Vite proxy is configured
+- Quick sanity requests
+  - Send a prompt in the UI; confirm response and logs appear
+  - Try an empty prompt to show validation error handling
+- Tests (optional, but nice to show): `pytest -q` and `npm test -s` → all green
+
 ## 🔐 Security Talking Points (Brief)
 
 - Keys never sent to frontend; server mediates Azure access.
