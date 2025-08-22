@@ -119,6 +119,7 @@ pip install -r requirements.txt
 flowchart LR
   %% Frontend
   subgraph Frontend
+    direction TB
     UI["Chat.tsx + components"]
     APIClient["services/api.ts"]
     UI --> APIClient
@@ -126,6 +127,7 @@ flowchart LR
 
   %% Backend
   subgraph Backend
+    direction TB
     Gateway["/api/*"]
     Routes["Blueprints: home_routes, completions_routes"]
     Service["services/azure_openai_service.py"]
@@ -135,10 +137,9 @@ flowchart LR
     Utils -. "config & logging" .- Routes
   end
 
-  %% Edges to external services
-  Browser(("User Browser")) --> UI
+  Browser["User Browser"] --> UI
   APIClient -- "fetch JSON" --> Gateway
-  Service --> Azure(("Azure OpenAI Deployment"))
+  Service --> Azure["Azure OpenAI Deployment"]
   Gateway -. diagnostics .- ConfigInfo["GET /api/config/info"]
 ```
 
