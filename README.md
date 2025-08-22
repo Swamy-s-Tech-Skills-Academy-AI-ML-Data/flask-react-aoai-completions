@@ -71,6 +71,25 @@ To include install paths as well:
 py -0p
 ```
 
+### Set a custom PowerShell window title (Windows)
+
+When using two external terminals, give each a clear title so you can tell them apart at a glance:
+
+```powershell
+$host.UI.RawUI.WindowTitle = 'Backend API'
+```
+
+In your second terminal:
+
+```powershell
+$host.UI.RawUI.WindowTitle = 'Vite Dev Server'
+```
+
+Notes:
+
+- This only affects the current terminal session.
+- You can also place the command in your PowerShell profile to persist a preferred title.
+
 ## ⚙️ Environment Loading Precedence
 
 Each configuration key resolves in this order:
