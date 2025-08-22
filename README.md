@@ -86,6 +86,7 @@ $host.UI.RawUI.WindowTitle = 'Vite Dev Server'
 ```
 
 Notes:
+
 - This only affects the current terminal session.
 - You can also place the command in your PowerShell profile to persist a preferred title.
 
