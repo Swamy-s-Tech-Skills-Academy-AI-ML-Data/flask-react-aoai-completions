@@ -103,18 +103,31 @@ pip install -r requirements.txt
 
 ## 🧠 Architecture (High-Level)
 
-```text
-          +------------------+             +----------------------------+
-          |   React (Vite)   |  fetch JSON |   Flask API (/api/*)       |
-          |  Chat Component  +-----------> | completions_routes.py      |
-          |  Local Messages  |             |  Validation / Logging      |
-          +---------+--------+             +--------------+-------------+
-                    |                                     |
-                    |                                     v
-                    |                           azure_openai_service.py
-                    |                            (_get_client -> Azure)
-                    |                                     |
-          User <----+                           Azure OpenAI Deployment
+```mermaid
+flowchart LR
+  %% Frontend
+  subgraph Frontend
+    UI["Chat.tsx + components"]
+    APIClient["services/api.ts"]
+    UI --> APIClient
+  end
+
+  %% Backend
+  subgraph Backend
+    Gateway["/api/*"]
+    Routes["Blueprints: home_routes, completions_routes"]
+    Service["services/azure_openai_service.py"]
+    Utils["utils: env_config, logging_config"]
+    Gateway --> Routes --> Service
+    Utils -. "config & logging" .- Gateway
+    Utils -. "config & logging" .- Routes
+  end
+
+  %% Edges to external services
+  Browser(("User Browser")) --> UI
+  APIClient -- "fetch JSON" --> Gateway
+  Service --> Azure(("Azure OpenAI Deployment"))
+  Gateway -. diagnostics .- ConfigInfo["GET /api/config/info"]
 ```
 
 Highlights:
