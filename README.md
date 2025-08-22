@@ -105,30 +105,29 @@ pip install -r requirements.txt
 
 ```mermaid
 flowchart LR
-  subgraph Frontend[Frontend (Vite React + TypeScript)]
-    UI[Chat.tsx + components]
-    APIClient[services/api.ts]
+  %% Frontend
+  subgraph Frontend
+    UI["Chat.tsx + components"]
+    APIClient["services/api.ts"]
     UI --> APIClient
   end
 
-  subgraph Backend[Backend (Flask API)]
-    Gateway[(/api/*)]
-    Routes[/Blueprints: home_routes & completions_routes/]
-    Service[services/azure_openai_service.py]
-    Utils[[utils: env_config, logging_config]]
+  %% Backend
+  subgraph Backend
+    Gateway["/api/*"]
+    Routes["Blueprints: home_routes, completions_routes"]
+    Service["services/azure_openai_service.py"]
+    Utils["utils: env_config, logging_config"]
     Gateway --> Routes --> Service
-    Utils -. config & logging .- Gateway
-    Utils -. config & logging .- Routes
+    Utils -. "config & logging" .- Gateway
+    Utils -. "config & logging" .- Routes
   end
 
-  Browser[(User Browser)] --> UI
-  APIClient -- fetch JSON --> Gateway
-  Service --> Azure[(Azure OpenAI Deployment)]
-  Gateway -. diagnostics .- ConfigInfo[/GET /api/config/info/]
-
-  classDef box fill:#f9f9f9,stroke:#999,stroke-width:1px;
-  class Frontend,Backend box;
-  class Azure box;
+  %% Edges to external services
+  Browser(("User Browser")) --> UI
+  APIClient -- "fetch JSON" --> Gateway
+  Service --> Azure(("Azure OpenAI Deployment"))
+  Gateway -. diagnostics .- ConfigInfo["GET /api/config/info"]
 ```
 
 Highlights:
