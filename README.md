@@ -59,6 +59,20 @@ Interpreter versioning: For consistent environments, add a `.python-version` fil
 3.13.5
 ```
 
+### Check installed Python versions (Windows)
+
+Use the Python launcher to list all installed Python versions it recognizes:
+
+```powershell
+py -0
+```
+
+To include install paths as well:
+
+```powershell
+py -0p
+```
+
 ## ⚙️ Environment Loading Precedence
 
 Each configuration key resolves in this order:
