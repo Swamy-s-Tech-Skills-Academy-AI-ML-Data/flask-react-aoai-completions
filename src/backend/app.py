@@ -7,7 +7,6 @@ from flask_cors import CORS
 
 from api.home_routes import home_api_bp
 from api.completions_routes import completions_api_bp
-from api.health_routes import health_api_bp
 
 from utils.logging_config import configure_logging
 from utils.env_config import list_effective_config

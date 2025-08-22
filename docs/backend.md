@@ -16,6 +16,60 @@ Python Flask backend powering Azure OpenAI Chat Completions for the demo React U
 
 ---
 
+## 🧠 Architecture (High-Level)
+
+```mermaid
+%%{init: {
+  'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'nodeSpacing': 60, 'rankSpacing': 90 },
+  'themeVariables': { 'fontSize': '16px', 'fontFamily': 'Segoe UI, Roboto, Helvetica, Arial' }
+}}%%
+flowchart TB
+
+  %% Row 1 — Frontend
+  subgraph Row1["Frontend"]
+    direction LR
+    Browser["User Browser"]
+    UI["Chat.tsx + components"]
+    APIClient["services/api.ts (Vite proxy /api)"]
+    Browser --> UI --> APIClient
+  end
+
+  %% Row 2 — Backend
+  subgraph Row2["Backend"]
+    direction LR
+    Gateway["/api/*"]
+    Routes["Blueprints: home_routes, completions_routes, config_routes"]
+    Service["services/azure_openai_service.py"]
+    Utils["utils: env_config, logging_config"]
+
+    APIClient -- "fetch JSON" --> Gateway
+    Gateway --> Routes --> Service
+    Utils -. "config & logging" .- Gateway
+    Utils -. "config & logging" .- Routes
+
+    ConfigInfo["GET /api/config/info"]:::diag
+    Gateway -. diagnostics .- ConfigInfo
+  end
+
+  classDef diag fill:#efeaff,stroke:#a48cf2,color:#3b2d72;
+
+  %% Row 3 — External
+  subgraph Row3["External"]
+    direction LR
+    Azure["Azure OpenAI Deployment"]
+  end
+
+  Service --> Azure
+```
+
+Highlights:
+
+- Vite proxy for /api avoids CORS in dev; or enable Flask-CORS.
+- /api/config/info surfaces non-secret config with source for quick checks.
+- Blueprints cleanly separate concerns; Azure calls isolated in a service.
+
+---
+
 ## 🔹 Installation & Setup
 
 > 1. Change directory to: `D:\STSAAIMLDT\flask-react-aoai-completions\src\backend`

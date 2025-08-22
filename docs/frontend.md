@@ -1,330 +1,139 @@
-# React + TypeScript + Vite + Tailwind CSS
+# Frontend: React + TypeScript + Vite + Tailwind
 
-Some Description.
+This app is a Vite + React (TypeScript) UI that talks to the Flask backend.
 
-## 📌 Step 1: Set Up the React + TypeScript Project
+## 1) Setup
 
-```powershell
-# Create a new Vite + React + TypeScript project
-npm create vite@latest cgpt-clone-gaih -- --template react-ts
-Run the following `PowerShell` commands:
+PowerShell (Windows):
 
 ```powershell
-# Create a new Vite + React + TypeScript pr---
-
-## **✅ What's Next?**
-
-- **Enhance the UI** – Improve styling, add animations.
-- **Integrate Auth0** – Implement login/logout properly.
-- **Improve API Calls** – Handle streaming responses from Flask.
-
----
-
-## **📌 Common Layout Issues & Fixes**
-
-### **Issue: Gap Between Chat Area and Footer**
-
-**Problem:** You may notice a purple/empty gap between the chat container and footer when using flexbox layout. This happens when:
-- Using `min-h-screen` instead of `h-screen`
-- The main content area doesn't properly expand to fill available space
-- Footer has `mt-auto` but the parent container allows extra height
-
-**Symptoms:**
-- Visible gap/space between chat area and footer
-- Chat container not utilizing full viewport height
-- Overall layout shorter than expected
-
-**✅ Solution:**
-
-Update your main layout container (`App.tsx`) to use proper height constraints:
-
-```tsx
-const App: React.FC = () => {
-  return (
-    <div className="h-screen flex flex-col bg-gradient-to-b from-slate-50 to-slate-100">
-      <TopNav />
-      <main className="flex-1 min-h-0 w-full px-3 md:px-6 py-3 flex justify-center items-stretch">
-        <Chat />
-      </main>
-      <Footer />
-    </div>
-  );
-};
+# from repo root
+cd src/frontend
+npm install
 ```
 
-**Key Changes:**
+Tailwind is already configured in this repo. If you are creating a new project from scratch, see Tailwind docs. In this repo the key files are `tailwind.config.js`, `postcss.config.js`, and `src/index.css`.
 
-- `min-h-screen` → `h-screen`: Forces container to exact viewport height
-- `flex-grow` → `flex-1`: More explicit space distribution
-- `min-h-0`: Prevents flex items from having minimum content size
+## 2) Configure API base URL
 
-**Result:** Chat area expands to fill all available space between header and footer with no gaps.
+The frontend uses `VITE_API_BASE_URL` to call the backend.
 
----
+- Without a proxy, set it to the Flask API base: `http://127.0.0.1:5009/api`
+- Or use the Vite dev proxy option below and set it to `/api`
 
-This should give you a **React + TypeScript UI** integrated with **Flask & Azure OpenAI**! 🚀 Let me know if you need further refinements. 😃create vite@latest cgpt-clone-gaih
+Create `.env.local` in `src/frontend` if needed:
 
-# Move into the project folder
-
-cd cgpt-clone-gaih
-
-# Install Tailwind CSS
-
-npm install -D tailwindcss@3 postcss autoprefixer
-npm install @heroicons/react
-npx tailwindcss init -p
-
+```env
+VITE_API_BASE_URL=http://127.0.0.1:5009/api
 ```
 
-## 📌 Step 2: Configure Tailwind
+You can verify backend config via: `GET http://127.0.0.1:5009/api/config/info`.
 
-### Modify `tailwind.config.ts`
+## 3) Optional: Vite dev proxy (avoids CORS in dev)
+
+Update `vite.config.ts` to proxy `/api` to Flask when running `npm run dev`:
 
 ```ts
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  theme: {
-    container: {
-      center: true,
-      padding: "1rem",
-      screens: {
-        sm: "100%",
-        md: "100%",
-        lg: "1200px",
-        xl: "1500px",
-        "2xl": "1600px",
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:5009',
+        changeOrigin: true,
       },
     },
-    extend: {},
   },
-  plugins: [],
-};
+})
 ```
 
-### Update `src/index.css`
+Then set `VITE_API_BASE_URL=/api` in `.env.local`.
 
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
-
----
-
-Got it! We'll build the **React UI with TypeScript and Tailwind CSS**, and integrate it with our **Flask API (Azure OpenAI backend).**
-
----
-
-## ✅ **Project Plan**
-
-✔ **Header** – Shows **Login/Logout** (Auth0 integration later).  
-✔ **Main Content Area** – Chat UI to interact with Flask API.  
-✔ **Footer** – Simple branding/info section.  
-✔ **Integration with Flask** – Calls the `/api/completions` endpoint.
-
----
-
----
-
----
-
-## **📌 Step 3: Build the App Layout**
-
-Now, let’s create the **Header, Chat, and Footer** components.
-
-### **1️⃣ `src/components/Header.tsx` (Login/Logout)**
-
-```tsx
-import { useState } from "react";
-
-const Header: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  return (
-    <header className="bg-blue-600 text-white p-4 flex justify-between items-center">
-      <h1 className="text-xl font-bold">ChatGPT Clone</h1>
-      <button
-        className="bg-white text-blue-600 px-4 py-2 rounded"
-        onClick={() => setIsLoggedIn(!isLoggedIn)}
-      >
-        {isLoggedIn ? "Logout" : "Login"}
-      </button>
-    </header>
-  );
-};
-
-export default Header;
-```
-
----
-
-### **2️⃣ `src/components/Chat.tsx` (Main Chat UI)**
-
-```tsx
-import { useState } from "react";
-
-const Chat: React.FC = () => {
-  const [prompt, setPrompt] = useState<string>("");
-  const [response, setResponse] = useState<string>("");
-
-  const sendRequest = async () => {
-    setResponse("Loading...");
-
-    try {
-      const res = await fetch("http://127.0.0.1:5009/api/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
-
-      const data = await res.text();
-      setResponse(data);
-    } catch (error) {
-      setResponse("Error fetching response.");
-    }
-  };
-
-  return (
-    <div className="p-6 text-center">
-      <h2 className="text-2xl font-semibold mb-4">Chat with AI</h2>
-      <textarea
-        className="border w-full p-2 rounded"
-        rows={3}
-        placeholder="Type your question..."
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-      />
-      <button
-        onClick={sendRequest}
-        className="bg-blue-600 text-white px-4 py-2 mt-2 rounded"
-      >
-        Send
-      </button>
-      <div className="mt-4 bg-gray-100 p-4 rounded">{response}</div>
-    </div>
-  );
-};
-
-export default Chat;
-```
-
----
-
-### **3️⃣ `src/components/Footer.tsx`**
-
-```tsx
-const Footer: React.FC = () => {
-  return (
-    <footer className="bg-gray-800 text-white text-center p-3">
-      © 2025 AI Chat App - Built with Flask & Azure OpenAI
-    </footer>
-  );
-};
-
-export default Footer;
-```
-
----
-
-## **📌 Step 4: Set Up the Main App**
-
-Now, modify **`src/App.tsx`** to use the components:
-
-```tsx
-import Header from "./components/Header";
-import Chat from "./components/Chat";
-import Footer from "./components/Footer";
-
-const App: React.FC = () => {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow flex justify-center items-center bg-gray-100">
-        <Chat />
-      </main>
-      <Footer />
-    </div>
-  );
-};
-
-export default App;
-```
-
----
-
-## **📌 Step 5: Start the React App**
-
-Run the following commands:
+## 4) Running the frontend
 
 ```powershell
-npm install  # Install dependencies
-npm run dev  # Start the development server
+cd src/frontend
+npm run dev
 ```
 
-The app will be available at **`http://localhost:5173/`** 🎉
+App runs at <http://localhost:5173>.
 
----
+## 5) Using the API client
 
-## **✅ What’s Next?**
+The helper in `src/frontend/src/services/api.ts` reads `VITE_API_BASE_URL` and calls `/completions`.
 
-- **Enhance the UI** – Improve styling, add animations.
-- **Integrate Auth0** – Implement login/logout properly.
-- **Improve API Calls** – Handle streaming responses from Flask.
+Example usage inside a React component:
 
----
+```tsx
+import { useState } from 'react'
+import { fetchAIResponse } from '../services/api'
 
-This should give you a **React + TypeScript UI** integrated with **Flask & Azure OpenAI**! 🚀 Let me know if you need further refinements. 😃
+export default function Chat() {
+  const [prompt, setPrompt] = useState('')
+  const [answer, setAnswer] = useState('')
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+  const send = async () => {
+    const res = await fetchAIResponse(prompt)
+    setAnswer('error' in res ? res.error : res.response)
+  }
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+  return (
+    <div className="p-4">
+      <textarea className="border w-full p-2" value={prompt} onChange={e => setPrompt(e.target.value)} />
+      <button className="mt-2 px-3 py-2 bg-blue-600 text-white" onClick={send}>Send</button>
+      <div className="mt-4 whitespace-pre-wrap">{answer}</div>
+    </div>
+  )
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 6) Layout tips
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+If you see a gap between chat area and footer, ensure your top-level container uses `h-screen`, the content area uses `flex-1 min-h-0`, and Footer is after the main content.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    "react-x": reactX,
-    "react-dom": reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs["recommended-typescript"].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-});
+## 7) Troubleshooting
+
+- CORS errors in the browser? Either enable Flask-CORS on the backend or use the Vite proxy (recommended in dev).
+- 404 for `/api/config/info`? Make sure the Flask server is running and the endpoint is registered as `/api/config/info`.
+- Mixed content or wrong port? Verify `VITE_API_BASE_URL` or dev proxy targets the backend `http://127.0.0.1:5009`.
+
+## 8) Dependency updates (Aug 2025)
+
+Summary of safe updates applied to the frontend toolchain:
+
+- Node engines: added `"engines": { "node": ">=18.0.0" }` in `package.json`.
+- Removed stray local dependency entry (cleanup): `"cgpt-clone-gaih": "file:"`.
+- Core runtime: `react@^19`, `react-dom@^19`.
+- Build tooling: `vite@^6.2`, `@vitejs/plugin-react@^4.3`.
+- Styling: `tailwindcss@^3.4`, `postcss@^8.5`, `autoprefixer@^10.4`.
+- Types & lint: `typescript@~5.7`, `eslint@^9.21`, `@eslint/js@^9.21`, `typescript-eslint@^8.24`.
+- Test stack: `vitest@^2.1.9`, `jsdom@^26`, `@testing-library/*` latest within current majors.
+
+How to validate locally (PowerShell):
+
+```powershell
+cd src/frontend
+npm install             # refresh lockfile and install
+npm run build           # ensure production build succeeds
+npm run test -s         # ensure tests pass
 ```
+
+Quick version and update commands (PowerShell):
+
+```powershell
+cd D:\STSAAIMLDT\flask-react-aoai-completions\src\frontend
+node -v
+npm -v
+npm update              # update within current major ranges
+npm run build
+npm test
+```
+
+If you hit oddities after upgrading:
+
+- Clear modules and reinstall: `rimraf node_modules package-lock.json; npm install` (or delete manually on Windows).
+- Ensure Node 18+ is in use: `node -v`.
+- Re-run `npm run build` and `npm test` to confirm.

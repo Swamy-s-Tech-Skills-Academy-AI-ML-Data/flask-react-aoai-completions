@@ -9,7 +9,7 @@ This project provides:
 - A Flask backend exposing:
   - `GET /` and `GET /api/` (welcome JSON)
   - `POST /api/completions` (single‑turn chat completion)
-  - `GET /api/health/config` (non‑secret config + source: env / file)
+    - `GET /api/config/info` (non‑secret config + source: env / file)
 - A React + TypeScript frontend with a simple multi‑message chat UI.
 - Structured logging (plain text or JSON) with request correlation IDs & latency.
 - Unified JSON error handling (404 / HTTPException / generic 500) + masked internal errors.
@@ -19,27 +19,23 @@ This project provides:
 
 ```text
 src/
- backend/
-  app.py
-  api/
-  services/
-  utils/
-  requirements.txt
- frontend/
-  src/
-   components/
-## 🔹 Installation & Setup
-python --version
-
-pip install virtualenv
-pip install flask-cors
-pip freeze > requirements.txt
+  backend/
+    app.py
+    api/
+    services/
+    utils/
+    requirements.txt
+  frontend/
+    package.json
+    src/
+      components/
+      services/
 ```
 
-Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
+## 🔹 Installation & Setup
 
 ```powershell
-  | GET | /api/config/info | Non‑secret config values + source |
+python --version
 pip --version
 
 pip install virtualenv
@@ -52,6 +48,8 @@ pip install -r requirements.txt  # Preferred (already committed)
 # pip install Flask python-dotenv openai flask-cors
 # pip freeze > requirements.txt
 ```
+
+Optional (version pinning): A `.python-version` file at repo root specifies the recommended interpreter (used by `pyenv` / some IDEs) – currently `3.13.5`.
 
 Interpreter versioning: For consistent environments, add a `.python-version` file at the repo root (recommended for pyenv/IDE integration). Example content:
 
@@ -81,7 +79,7 @@ Each configuration key resolves in this order:
 2. First `.env` discovered walking upward from `src/backend/utils/env_config.py` to repo root
 3. Absent (null)
 
-Inspect non‑secret effective values & their source at `GET /api/health/config`. Secrets are never returned.
+Inspect non‑secret effective values & their source at `GET /api/config/info`. Secrets are never returned.
 
 ## 🔹 To install dependencies later
 
@@ -104,30 +102,47 @@ pip install -r requirements.txt
 ## 🧠 Architecture (High-Level)
 
 ```mermaid
-flowchart LR
-  %% Frontend
-  subgraph Frontend
+%%{init: {
+  'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'nodeSpacing': 60, 'rankSpacing': 90 },
+  'themeVariables': { 'fontSize': '16px', 'fontFamily': 'Segoe UI, Roboto, Helvetica, Arial' }
+}}%%
+flowchart TB
+
+  %% Row 1 — Frontend
+  subgraph Row1["Frontend"]
+    direction LR
+    Browser["User Browser"]
     UI["Chat.tsx + components"]
-    APIClient["services/api.ts"]
-    UI --> APIClient
+    APIClient["services/api.ts (Vite proxy /api)"]
+    Browser --> UI --> APIClient
   end
 
-  %% Backend
-  subgraph Backend
+  %% Row 2 — Backend
+  subgraph Row2["Backend"]
+    direction LR
     Gateway["/api/*"]
-    Routes["Blueprints: home_routes, completions_routes"]
+    Routes["Blueprints: home_routes, completions_routes, config_routes"]
     Service["services/azure_openai_service.py"]
     Utils["utils: env_config, logging_config"]
+
+    APIClient -- "fetch JSON" --> Gateway
     Gateway --> Routes --> Service
     Utils -. "config & logging" .- Gateway
     Utils -. "config & logging" .- Routes
+
+    ConfigInfo["GET /api/config/info"]:::diag
+    Gateway -. diagnostics .- ConfigInfo
   end
 
-  %% Edges to external services
-  Browser(("User Browser")) --> UI
-  APIClient -- "fetch JSON" --> Gateway
-  Service --> Azure(("Azure OpenAI Deployment"))
-  Gateway -. diagnostics .- ConfigInfo["GET /api/config/info"]
+  classDef diag fill:#efeaff,stroke:#a48cf2,color:#3b2d72;
+
+  %% Row 3 — External
+  subgraph Row3["External"]
+    direction LR
+    Azure["Azure OpenAI Deployment"]
+  end
+
+  Service --> Azure
 ```
 
 Highlights:
@@ -301,7 +316,7 @@ Demo tip: Open `Chat.test.tsx` to show `vi.mock` usage isolating UI from network
 |--------|------|-------------|
 | GET | / | Root welcome JSON |
 | GET | /api/ | API namespace welcome |
-| GET | /api/health/config | Non‑secret config values + source |
+| GET | /api/config/info | Non‑secret config values + source |
 | POST | /api/completions | Single‑turn chat completion |
 
 Example request:
