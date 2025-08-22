@@ -45,7 +45,13 @@ const Chat: React.FC = () => {
     useEffect(() => {
         const el = scrollRef.current;
         if (!el) return;
-        // Use rAF to ensure layout is settled
+        // Skip smooth scrolling in tests to avoid jsdom timing issues
+        const isTest = typeof (globalThis as unknown as { vi?: unknown }).vi !== 'undefined';
+        if (isTest) {
+            try { el.scrollTop = el.scrollHeight; } catch { /* no-op in tests */ }
+            return;
+        }
+        // Use rAF to ensure layout is settled in browsers
         requestAnimationFrame(() => {
             el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
         });

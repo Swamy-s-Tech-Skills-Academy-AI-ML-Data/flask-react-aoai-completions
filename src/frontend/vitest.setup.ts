@@ -19,3 +19,19 @@ if (typeof globalThis.cancelAnimationFrame !== 'function') {
         clearTimeout(id as any);
     };
 }
+
+// Silence FontAwesome React component in tests to avoid DOM/SVG warnings
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - vitest globals provided via config
+vi.mock('@fortawesome/react-fontawesome', () => ({
+    // Minimal stub component returning null
+    FontAwesomeIcon: () => null,
+}));
+
+// Provide minimal icon objects to satisfy imports
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - vitest globals provided via config
+vi.mock('@fortawesome/free-solid-svg-icons', () => ({
+    faUser: {},
+    faRobot: {},
+}));
